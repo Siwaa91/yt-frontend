@@ -8,25 +8,21 @@ function VideoDownloader() {
 
   const handleDownload = async () => {
     try {
-      const response = await axios.post(
-        "https://yt-backend-5nnt.onrender.com/download",
-        {
-          video_url: videoUrl,
-        },
-        { responseType: "blob" }
-      );
+        const response = await axios.post('https://yt-backend-5nnt.onrender.com/download', {
+            url: videoUrl, // Ensure videoUrl is correctly set
+        });
 
-      const blob = new Blob([response.data], { type: "video/mp4" });
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = "downloaded_video.mp4"; // Default file name
-      link.click();
-
-      setMessage("Download successful");
+        // Handle successful response
+        const blob = new Blob([response.data], { type: 'video/mp4' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'video.mp4'; // Set the desired filename
+        link.click();
     } catch (error) {
-      setMessage("Something went wrong");
+        console.error("Error downloading video:", error.response.data);
+        alert("Something went wrong: " + error.response.data.error);
     }
-  };
+};
 
   return (
     <div className="container">
