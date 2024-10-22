@@ -5,16 +5,25 @@ import "./Style.css";
 const VideoDownloader = () => {
   const [videoUrl, setVideoUrl] = useState("");
   const [message, setMessage] = useState("");
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownload = async () => {
+    if (!videoUrl.trim()) {
+      setMessage("Please enter a valid video URL.");
+      return;
+    }
+
+    setIsDownloading(true); // Disable button during download
+
     try {
       const response = await axios.post(
         "https://yt-backend-5nnt.onrender.com/download",
         { url: videoUrl },
         {
           headers: {
-            "Content-Type": "application/json", // Set content type as JSON
+            "Content-Type": "application/json",
           },
+          responseType: "blob", // Expect a blob (binary data)
         }
       );
 
@@ -33,10 +42,12 @@ const VideoDownloader = () => {
         );
       } else {
         setMessage(
-          "Something went wrong: " + error.response?.data?.error ||
-            error.message
+          "Something went wrong: " +
+            (error.response?.data?.error || error.message)
         );
       }
+    } finally {
+      setIsDownloading(false); // Re-enable button after download completes
     }
   };
 
@@ -49,7 +60,9 @@ const VideoDownloader = () => {
         onChange={(e) => setVideoUrl(e.target.value)}
         placeholder="Enter video URL"
       />
-      <button onClick={handleDownload}>Download</button>
+      <button onClick={handleDownload} disabled={isDownloading}>
+        {isDownloading ? "Downloading..." : "Download"}
+      </button>
       {message && <p>{message}</p>}
     </div>
   );
